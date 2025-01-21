@@ -13,6 +13,7 @@ public class AuthController {
 
     @PostMapping("/registration")
     public ResponseEntity<RegistrationRes> authRegistration(){
+
         return null;
     }
 
