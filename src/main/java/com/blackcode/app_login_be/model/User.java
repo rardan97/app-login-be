@@ -16,7 +16,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private String userId;
+    private Long userId;
 
     private String userFullName;
 
@@ -27,4 +27,14 @@ public class User {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id")
     private Role userRole;
+
+    public User(String userFullName, String username, String encode, String password) {
+    }
+
+    public User(String userFullName, String userName, String userPassword, Role userRole) {
+        this.userFullName = userFullName;
+        this.userName = userName;
+        this.userPassword = userPassword;
+        this.userRole = userRole;
+    }
 }
