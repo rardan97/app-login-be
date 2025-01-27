@@ -13,15 +13,15 @@ import java.time.Instant;
 @Getter
 @Setter
 @Entity
-@Table(name = "tb_refresh_token")
+@Table(name = "tb_refresh_token", uniqueConstraints = @UniqueConstraint(columnNames = "user_id"))
 public class RefreshToken {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @OneToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JoinColumn(name = "user_id", referencedColumnName = "userId")
     private User user;
 
     @Column(nullable = false, unique = true)

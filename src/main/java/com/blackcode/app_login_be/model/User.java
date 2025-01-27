@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
@@ -15,7 +14,7 @@ import lombok.Setter;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
     private String userFullName;
@@ -28,8 +27,7 @@ public class User {
     @JoinColumn(name = "role_id")
     private Role userRole;
 
-    public User(String userFullName, String username, String encode, String password) {
-    }
+
 
     public User(String userFullName, String userName, String userPassword, Role userRole) {
         this.userFullName = userFullName;
