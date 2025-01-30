@@ -11,6 +11,7 @@
 ## Dependencies
 
 - Spring Web
+- Spring Security
 - Spring Data JPA
 - Spring Boot DevTools
 - Mysql Driver
