@@ -101,17 +101,7 @@ public class AuthController {
             return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already in use!"));
         }
 
-        System.out.println("full name : "+signupRequest.getUserFullName());
-        System.out.println("username : "+signupRequest.getUsername());
-        System.out.println("password : "+signupRequest.getPassword());
-        System.out.println("role : "+signupRequest.getRole());
-
         User user = new User(signupRequest.getUserFullName(), signupRequest.getUsername(), encoder.encode(signupRequest.getPassword()), roleData.get());
-        System.out.println("full namev2 : "+user.getUserFullName());
-        System.out.println("usernamev2 : "+user.getUserName());
-        System.out.println("passwordv2 : "+user.getUserPassword());
-        System.out.println("rolev2 : "+user.getUserRole());
-
         userRepository.save(user);
 
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
@@ -120,9 +110,6 @@ public class AuthController {
     @PostMapping("/refreshtoken")
     public ResponseEntity<?> refreshtoken(@Valid @RequestBody TokenRefreshRequest request){
         String requestRefreshToken = request.getRefreshToken();
-
-        System.out.println("Test");
-
         return refreshTokenService.findByToken(requestRefreshToken)
                 .map(refreshTokenService::verifyExpiration)
                 .map(RefreshToken::getUser)
@@ -139,44 +126,27 @@ public class AuthController {
     @PostMapping("/signout")
     public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
         System.out.println("Test request : "+request.getMethod());
-        System.out.println("Test x");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication != null && authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken)) {
-            System.out.println("Test x1");
-
-
             String token = request.getHeader("Authorization");
-            System.out.println("check token : "+token);
-
             if (token != null && token.startsWith("Bearer ")) {
-                System.out.println("Test x2");
                 UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
                 Long userId = userDetails.getUserId();
-
-                // Mengambil token tanpa prefix "Bearer "
 
                 String jwtToken = token.substring(7);
 
                 Optional<UserToken> userTokenData = userTokenRepository.findByToken(jwtToken);
                 if(userTokenData.isPresent()){
-                    System.out.println("check token ada");
                     refreshTokenService.deleteByUserId(userId);
                     userTokenData.get().setIsActive(false);
                     userTokenRepository.save(userTokenData.get());
 
                     return ResponseEntity.ok(new MessageResponse("Log out successful!"));
                 }else{
-                    System.out.println("check token tidak ada");
+                    System.out.println("check token not found");
                     return ResponseEntity.ok(new MessageResponse("Log out Failed!!!"));
                 }
-
-
-                // Cari token di database dan tandai sebagai tidak aktif
-
-
-
-
             } else {
                 return ResponseEntity.ok(new MessageResponse("Authorization not null"));
             }
