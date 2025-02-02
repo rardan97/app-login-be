@@ -3,16 +3,21 @@ package com.blackcode.app_login_be.service;
 //import com.blackcode.app_login_be.dto.RoleReq;
 //import com.blackcode.app_login_be.dto.RoleRes;
 
+import com.blackcode.app_login_be.payload.request.RoleRequest;
+import com.blackcode.app_login_be.payload.response.RoleResponse;
+import org.springframework.stereotype.Service;
+
 import java.util.List;
 
+@Service
 public interface RoleService {
-//    List<RoleRes> getListRoleAll();
-//    RoleRes getRoleById(Long roleId);
-//
-//    RoleRes createRole(RoleReq roleReq);
-//
-//    RoleRes updateRole(Long roleId, RoleReq roleReq);
-//
-//    String deleteRole(Long roleId);
+    List<RoleResponse> getListRoleAll();
+    RoleResponse getRoleById(Long roleId);
+
+    RoleResponse createRole(RoleRequest roleReq);
+
+    RoleResponse updateRole(Long roleId, RoleRequest roleReq);
+
+    boolean deleteRole(Long roleId);
 
 }

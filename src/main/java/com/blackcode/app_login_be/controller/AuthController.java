@@ -45,7 +45,6 @@ import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -124,13 +123,17 @@ public class AuthController {
     }
 
     @PostMapping("/signout")
-    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<?> logout(
+            HttpServletRequest request,
+            HttpServletResponse response) {
         System.out.println("Test request : "+request.getMethod());
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication != null && authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken)) {
+            System.out.println("Validasi 1");
             String token = request.getHeader("Authorization");
             if (token != null && token.startsWith("Bearer ")) {
+                System.out.println("Validasi 2");
                 UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
                 Long userId = userDetails.getUserId();
 
@@ -138,6 +141,7 @@ public class AuthController {
 
                 Optional<UserToken> userTokenData = userTokenRepository.findByToken(jwtToken);
                 if(userTokenData.isPresent()){
+                    System.out.println("Validasi 3");
                     refreshTokenService.deleteByUserId(userId);
                     userTokenData.get().setIsActive(false);
                     userTokenRepository.save(userTokenData.get());

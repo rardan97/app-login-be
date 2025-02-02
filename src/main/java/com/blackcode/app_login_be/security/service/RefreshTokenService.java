@@ -46,19 +46,30 @@ public class RefreshTokenService {
 
     public RefreshToken createRefreshToken(String jwt, Long userId){
 
+
+        RefreshToken refreshToken = null;
         Optional<RefreshToken> existingToken = refreshTokenRepository.findByUserId(userId);
+
         if (existingToken.isPresent()) {
             // Data sudah ada, Anda bisa update atau memberikan response
-            throw new DataIntegrityViolationException("Token untuk user_id " + userId + " sudah ada.");
+//            throw new DataIntegrityViolationException("Token untuk user_id " + userId + " sudah ada.");
+            refreshToken = new RefreshToken();
+            refreshToken.setId(existingToken.get().getId());
+            refreshToken.setUser(existingToken.get().getUser());
+            refreshToken.setExpiryDate(existingToken.get().getExpiryDate());
+            refreshToken.setToken(existingToken.get().getToken());
 
+
+        }else{
+            User dataUser = userRepository.findById(userId).get();
+            refreshToken = new RefreshToken();
+            refreshToken.setUser(dataUser);
+            refreshToken.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
+            refreshToken.setToken(UUID.randomUUID().toString());
+            refreshToken = refreshTokenRepository.save(refreshToken);
         }
 
-        User dataUser = userRepository.findById(userId).get();
-        RefreshToken refreshToken = new RefreshToken();
-        refreshToken.setUser(dataUser);
-        refreshToken.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
-        refreshToken.setToken(UUID.randomUUID().toString());
-        refreshToken = refreshTokenRepository.save(refreshToken);
+
         userTokenService.processUserTokenAdd(userId, jwt);
         return refreshToken;
     }
