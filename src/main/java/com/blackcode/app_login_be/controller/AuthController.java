@@ -30,9 +30,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -77,17 +75,32 @@ public class AuthController {
 
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest){
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+        try {
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-        String jwt = jwtUtils.generateJwtToken(userDetails);
-        List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
-                .collect(Collectors.toList());
+            String jwt = jwtUtils.generateJwtToken(userDetails);
+            List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
+                    .collect(Collectors.toList());
 
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken(jwt, userDetails.getUserId());
-        return ResponseEntity.ok(new JwtResponse(jwt, refreshToken.getToken(), userDetails.getUserId(), userDetails.getUsername(), roles));
+            RefreshToken refreshToken = refreshTokenService.createRefreshToken(jwt, userDetails.getUserId());
+            return ResponseEntity.status(HttpStatus.OK).body(new JwtResponse(jwt, refreshToken.getToken(), userDetails.getUserId(), userDetails.getUsername(), roles));
+        }catch (BadCredentialsException e) {
+            // Jika username atau password salah, kembalikan status code 401 Unauthorized
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
+        } catch (AccountExpiredException e) {
+            // Jika akun telah kedaluwarsa, kembalikan status code 401 Unauthorized
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Account has expired");
+        } catch (LockedException e) {
+            // Jika akun terkunci, kembalikan status code 403 Forbidden
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Account is locked");
+        } catch (Exception e) {
+            // Tangani error umum lainnya, kembalikan status code 500 Internal Server Error
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while processing the login request");
+        }
+
     }
 
     @PostMapping("/signup")
