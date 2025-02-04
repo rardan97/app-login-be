@@ -73,7 +73,6 @@ public class RoleServiceImpl implements RoleService {
             rtnRoleResponse.setRoleName(roleUpdate.getRoleName());
             return rtnRoleResponse;
         }
-
         return null;
     }
 

@@ -24,18 +24,10 @@ public class RoleController {
 
     @GetMapping("/getAllRole")
     public ResponseEntity<List<RoleResponse>> getAll(@RequestHeader("Authorization") String authHeader){
-
         List<RoleResponse> getListAll = roleService.getListRoleAll();
-        for (RoleResponse temp : getListAll){
-            System.out.println("Data Row Controller");
-            System.out.println(temp.getRoleId());
-            System.out.println(temp.getRoleName());
-        }
-
-        System.out.println("test role");
         return new ResponseEntity<>(getListAll, HttpStatus.OK);
     }
-//
+
     @GetMapping("/getRoleById/{roleId}")
     public ResponseEntity<RoleResponse> getRoleById(@PathVariable("roleId") Long id){
         RoleResponse rtnRole = roleService.getRoleById(id);
@@ -50,14 +42,12 @@ public class RoleController {
 
     @PutMapping("/updateRole/{roleId}")
     public ResponseEntity<RoleResponse> updateRole(@PathVariable("roleId") Long id, @RequestBody RoleRequest roleReq){
-//        Long idx =Long.parseLong(id);
         RoleResponse updateRole = roleService.updateRole(id, roleReq);
         return new ResponseEntity<>(updateRole, HttpStatus.OK);
     }
 
     @DeleteMapping("/deleteRole/{roleId}")
     public ResponseEntity<Map<String, String>> deleteRole(@PathVariable("roleId") Long id){
-//        Long idx =Long.parseLong(id);
         boolean role = roleService.deleteRole(id);
         Map<String, String> rtn = new HashMap<>();
         if(role){
@@ -68,7 +58,6 @@ public class RoleController {
             rtn.put("status", "failed");
             rtn.put("message", "role "+id+" delete failed");
         }
-
         return new ResponseEntity<>(rtn, HttpStatus.OK);
     }
 }

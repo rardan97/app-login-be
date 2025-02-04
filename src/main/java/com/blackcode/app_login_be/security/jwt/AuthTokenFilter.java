@@ -1,7 +1,6 @@
 package com.blackcode.app_login_be.security.jwt;
 
 import com.blackcode.app_login_be.model.User;
-import com.blackcode.app_login_be.model.UserToken;
 import com.blackcode.app_login_be.repository.UserRepository;
 import com.blackcode.app_login_be.repository.UserTokenRepository;
 import com.blackcode.app_login_be.security.service.UserDetailsServiceImpl;
@@ -16,7 +15,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -38,11 +36,12 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     @Autowired
     UserRepository userRepository;
 
-
     private static final Logger logger = LoggerFactory.getLogger(AuthTokenFilter.class);
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
         try{
             String jwt = parseJwt(request);
             if(jwt != null && jwtUtils.validateJwtToken(jwt)){
@@ -51,7 +50,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                 dataUser.ifPresent(user -> userTokenRepository.findByUserId(user.getUserId()).ifPresent(userToken -> {
                     if (userToken.getToken().equals(jwt)) {
                         if (!userToken.getIsActive()) {
-                            SecurityContextHolder.clearContext(); // Hapus konteks keamanan jika token tidak aktif
+                            SecurityContextHolder.clearContext();
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                             try {
                                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token has been invalidated or expired");
@@ -70,14 +69,15 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                 }));
 
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
-                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                        userDetails,
+                        null,
+                        userDetails.getAuthorities());
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
         }catch (Exception e){
             logger.error("Cannot set user authentication: {}", e.getMessage());
-
         }
         filterChain.doFilter(request, response);
     }

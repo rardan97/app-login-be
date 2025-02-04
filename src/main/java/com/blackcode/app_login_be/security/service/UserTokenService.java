@@ -30,8 +30,8 @@ public class UserTokenService {
 
     public void processUserTokenAdd(Long userId, String jwt){
         Date date = new Date((new Date()).getTime() + jwtExpirationMs);
-        LocalDateTime localDateTime = date.toInstant()              // Mengonversi ke Instant
-                .atZone(ZoneId.systemDefault()) // Menggunakan zona waktu default
+        LocalDateTime localDateTime = date.toInstant()
+                .atZone(ZoneId.systemDefault())
                 .toLocalDateTime();
 
         Optional<UserToken> userTokenData = userTokenRepository.findByUserId(userId);
@@ -46,21 +46,19 @@ public class UserTokenService {
             System.out.println("check jwt Add : "+jwt);
             UserToken userToken = new UserToken();
             userToken.setToken(jwt);
-            userToken.setUserId(userId); // Atau simpan user ID yang terkait
-            userToken.setIsActive(true); // Status token aktif
+            userToken.setUserId(userId);
+            userToken.setIsActive(true);
             userToken.setExpiryDate(localDateTime);
             userToken.setCreatedAt(LocalDateTime.now());
             userToken.setUpdatedAt(LocalDateTime.now());
-
             userTokenRepository.save(userToken);
         }
     }
 
-
     public void processUserTokenRefresh(String userName, String jwt){
         Date date = new Date((new Date()).getTime() + jwtExpirationMs);
-        LocalDateTime localDateTime = date.toInstant()              // Mengonversi ke Instant
-                .atZone(ZoneId.systemDefault()) // Menggunakan zona waktu default
+        LocalDateTime localDateTime = date.toInstant()
+                .atZone(ZoneId.systemDefault())
                 .toLocalDateTime();
 
         Optional<User> dataUser = userRepository.findByUserName(userName);
@@ -75,7 +73,5 @@ public class UserTokenService {
                 userTokenRepository.save(userTokenData.get());
             }
         }
-
-
     }
 }

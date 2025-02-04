@@ -1,11 +1,7 @@
 package com.blackcode.app_login_be.security.service;
 
-import com.blackcode.app_login_be.model.Role;
 import com.blackcode.app_login_be.model.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,7 +10,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class UserDetailsImpl implements UserDetails {
 
@@ -52,8 +47,6 @@ public class UserDetailsImpl implements UserDetails {
         return authorities;
     }
 
-
-
     public Long getUserId() {
         return userId;
     }
@@ -87,7 +80,6 @@ public class UserDetailsImpl implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-
 
     @Override
     public boolean equals(Object o) {

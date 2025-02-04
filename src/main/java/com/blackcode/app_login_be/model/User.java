@@ -27,8 +27,6 @@ public class User {
     @JoinColumn(name = "role_id")
     private Role userRole;
 
-
-
     public User(String userFullName, String userName, String userPassword, Role userRole) {
         this.userFullName = userFullName;
         this.userName = userName;

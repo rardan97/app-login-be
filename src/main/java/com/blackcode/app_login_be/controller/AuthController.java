@@ -1,6 +1,5 @@
 package com.blackcode.app_login_be.controller;
 
-
 import com.blackcode.app_login_be.execption.TokenRefreshException;
 import com.blackcode.app_login_be.model.RefreshToken;
 import com.blackcode.app_login_be.model.Role;
@@ -19,16 +18,11 @@ import com.blackcode.app_login_be.security.jwt.JwtUtils;
 import com.blackcode.app_login_be.security.service.RefreshTokenService;
 import com.blackcode.app_login_be.security.service.UserDetailsImpl;
 import com.blackcode.app_login_be.security.service.UserTokenService;
-import com.blackcode.app_login_be.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
@@ -36,10 +30,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -68,15 +58,14 @@ public class AuthController {
     @Autowired
     JwtUtils jwtUtils;
 
-
-
     @Autowired
     RefreshTokenService refreshTokenService;
 
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest){
         try {
-            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
             UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
@@ -86,21 +75,21 @@ public class AuthController {
                     .collect(Collectors.toList());
 
             RefreshToken refreshToken = refreshTokenService.createRefreshToken(jwt, userDetails.getUserId());
-            return ResponseEntity.status(HttpStatus.OK).body(new JwtResponse(jwt, refreshToken.getToken(), userDetails.getUserId(), userDetails.getUsername(), roles));
+            return ResponseEntity.status(HttpStatus.OK).body(new JwtResponse(
+                    jwt,
+                    refreshToken.getToken(),
+                    userDetails.getUserId(),
+                    userDetails.getUsername(),
+                    roles));
         }catch (BadCredentialsException e) {
-            // Jika username atau password salah, kembalikan status code 401 Unauthorized
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
         } catch (AccountExpiredException e) {
-            // Jika akun telah kedaluwarsa, kembalikan status code 401 Unauthorized
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Account has expired");
         } catch (LockedException e) {
-            // Jika akun terkunci, kembalikan status code 403 Forbidden
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Account is locked");
         } catch (Exception e) {
-            // Tangani error umum lainnya, kembalikan status code 500 Internal Server Error
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while processing the login request");
         }
-
     }
 
     @PostMapping("/signup")
@@ -113,9 +102,12 @@ public class AuthController {
             return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already in use!"));
         }
 
-        User user = new User(signupRequest.getUserFullName(), signupRequest.getUsername(), encoder.encode(signupRequest.getPassword()), roleData.get());
+        User user = new User(
+                signupRequest.getUserFullName(),
+                signupRequest.getUsername(),
+                encoder.encode(signupRequest.getPassword()),
+                roleData.get());
         userRepository.save(user);
-
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }
 
@@ -131,8 +123,6 @@ public class AuthController {
                     return ResponseEntity.ok(new TokenRefreshResponse(token, requestRefreshToken));
                 }).orElseThrow(() -> new TokenRefreshException(requestRefreshToken,
                         "Refresh token is not in database!"));
-
-
     }
 
     @PostMapping("/signout")
@@ -142,23 +132,21 @@ public class AuthController {
         System.out.println("Test request : "+request.getMethod());
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (authentication != null && authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken)) {
+        if (authentication != null && authentication.isAuthenticated() &&
+                !(authentication instanceof AnonymousAuthenticationToken)) {
             System.out.println("Validasi 1");
             String token = request.getHeader("Authorization");
             if (token != null && token.startsWith("Bearer ")) {
                 System.out.println("Validasi 2");
                 UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
                 Long userId = userDetails.getUserId();
-
                 String jwtToken = token.substring(7);
-
                 Optional<UserToken> userTokenData = userTokenRepository.findByToken(jwtToken);
                 if(userTokenData.isPresent()){
                     System.out.println("Validasi 3");
                     refreshTokenService.deleteByUserId(userId);
                     userTokenData.get().setIsActive(false);
                     userTokenRepository.save(userTokenData.get());
-
                     return ResponseEntity.ok(new MessageResponse("Log out successful!"));
                 }else{
                     System.out.println("check token not found");
@@ -167,10 +155,8 @@ public class AuthController {
             } else {
                 return ResponseEntity.ok(new MessageResponse("Authorization not null"));
             }
-
         }else {
             return ResponseEntity.ok(new MessageResponse("authentication not found"));
         }
-
     }
 }

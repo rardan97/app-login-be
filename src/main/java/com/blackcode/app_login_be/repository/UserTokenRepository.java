@@ -9,10 +9,7 @@ import java.util.Optional;
 @Repository
 public interface UserTokenRepository extends JpaRepository<UserToken, Long> {
     Optional<UserToken> findByToken(String token);
-
     Optional<UserToken> findByUserId(Long userId);
     Optional<UserToken> findByUserIdAndToken(Long userId, String token);
-
-    // Query untuk menandai token sebagai tidak aktif saat logout
     void deleteByToken(String token);
 }

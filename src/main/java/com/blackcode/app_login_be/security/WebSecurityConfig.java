@@ -1,6 +1,5 @@
 package com.blackcode.app_login_be.security;
 
-
 import com.blackcode.app_login_be.security.jwt.AuthEntryPointJwt;
 import com.blackcode.app_login_be.security.jwt.AuthTokenFilter;
 import com.blackcode.app_login_be.security.service.UserDetailsServiceImpl;
@@ -17,7 +16,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -39,14 +37,6 @@ public class WebSecurityConfig {
         return new AuthTokenFilter();
     }
 
-//    @Bean
-//    public AuthenticationProvider authenticationProvider() {
-//        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-//        provider.setUserDetailsService(userDetailsService);
-//        provider.setPasswordEncoder(passwordEncoder());
-//        return provider;
-//    }
-
     @Bean
     public DaoAuthenticationProvider daoAuthenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -65,8 +55,6 @@ public class WebSecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
@@ -81,7 +69,6 @@ public class WebSecurityConfig {
         return http.build();
     }
 
-
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
@@ -93,5 +80,4 @@ public class WebSecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-
 }
