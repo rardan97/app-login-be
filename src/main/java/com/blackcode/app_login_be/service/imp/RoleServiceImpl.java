@@ -20,6 +20,25 @@ public class RoleServiceImpl implements RoleService {
     private RoleRepository roleRepository;
 
     @Override
+    public List<RoleResponse> getListRoleAllNotAdmin() {
+        List<RoleResponse> rtnListAll = new ArrayList<>();
+        List<Role> roleList = roleRepository.findAll();
+        for (Role row : roleList){
+            if(row.getRoleId() != 1){
+                System.out.println("Data role List");
+                System.out.println(row.getRoleId());
+                System.out.println(row.getRoleName());
+                RoleResponse rtnRow = new RoleResponse();
+                rtnRow.setRoleId(row.getRoleId());
+                rtnRow.setRoleName(row.getRoleName());
+                rtnListAll.add(rtnRow);
+            }
+
+        }
+        return rtnListAll;
+    }
+
+    @Override
     public List<RoleResponse> getListRoleAll() {
         List<RoleResponse> rtnListAll = new ArrayList<>();
         List<Role> roleList = roleRepository.findAll();

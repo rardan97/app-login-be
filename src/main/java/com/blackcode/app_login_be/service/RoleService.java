@@ -8,7 +8,12 @@ import java.util.List;
 
 @Service
 public interface RoleService {
+
+    List<RoleResponse> getListRoleAllNotAdmin();
+
     List<RoleResponse> getListRoleAll();
+
+
     RoleResponse getRoleById(Long roleId);
 
     RoleResponse createRole(RoleRequest roleReq);

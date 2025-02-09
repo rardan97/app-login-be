@@ -22,6 +22,7 @@ public class RoleController {
     @Autowired
     private RoleService roleService;
 
+
     @GetMapping("/getAllRole")
     public ResponseEntity<List<RoleResponse>> getAll(@RequestHeader("Authorization") String authHeader){
         List<RoleResponse> getListAll = roleService.getListRoleAll();

@@ -10,6 +10,7 @@ import com.blackcode.app_login_be.payload.request.SignupRequest;
 import com.blackcode.app_login_be.payload.request.TokenRefreshRequest;
 import com.blackcode.app_login_be.payload.response.JwtResponse;
 import com.blackcode.app_login_be.payload.response.MessageResponse;
+import com.blackcode.app_login_be.payload.response.RoleResponse;
 import com.blackcode.app_login_be.payload.response.TokenRefreshResponse;
 import com.blackcode.app_login_be.repository.RoleRepository;
 import com.blackcode.app_login_be.repository.UserRepository;
@@ -18,6 +19,7 @@ import com.blackcode.app_login_be.security.jwt.JwtUtils;
 import com.blackcode.app_login_be.security.service.RefreshTokenService;
 import com.blackcode.app_login_be.security.service.UserDetailsImpl;
 import com.blackcode.app_login_be.security.service.UserTokenService;
+import com.blackcode.app_login_be.service.RoleService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -48,6 +50,9 @@ public class AuthController {
 
     @Autowired
     RoleRepository roleRepository;
+
+    @Autowired
+    private RoleService roleService;
 
     @Autowired
     PasswordEncoder encoder;
@@ -92,14 +97,24 @@ public class AuthController {
         }
     }
 
+    @GetMapping("/getAllRole")
+    public ResponseEntity<List<RoleResponse>> getAll(){
+        List<RoleResponse> getListAll = roleService.getListRoleAllNotAdmin();
+        return new ResponseEntity<>(getListAll, HttpStatus.OK);
+    }
+
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signupRequest){
+
+        System.out.println("username : "+signupRequest.getUsername());
         if(userRepository.existsByUserName(signupRequest.getUsername())){
             return ResponseEntity.badRequest().body(new MessageResponse("Error : Username is already taken!"));
         }
-        Optional<Role> roleData = roleRepository.findByRoleName(signupRequest.getRole());
+        System.out.println("username : "+signupRequest.getRole());
+        long roleId = Long.valueOf(signupRequest.getRole());
+        Optional<Role> roleData = roleRepository.findById(roleId);
         if(roleData == null || roleData.isEmpty()){
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already in use!"));
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: Role Not Found!"));
         }
 
         User user = new User(
