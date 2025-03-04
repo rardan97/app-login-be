@@ -13,7 +13,6 @@ public interface RoleService {
 
     List<RoleResponse> getListRoleAll();
 
-
     RoleResponse getRoleById(Long roleId);
 
     RoleResponse createRole(RoleRequest roleReq);
@@ -21,5 +20,4 @@ public interface RoleService {
     RoleResponse updateRole(Long roleId, RoleRequest roleReq);
 
     boolean deleteRole(Long roleId);
-
 }

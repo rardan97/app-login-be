@@ -1,6 +1,5 @@
 package com.blackcode.app_login_be.service.imp;
 
-
 import com.blackcode.app_login_be.model.Role;
 import com.blackcode.app_login_be.payload.request.RoleRequest;
 import com.blackcode.app_login_be.payload.response.RoleResponse;
@@ -33,7 +32,6 @@ public class RoleServiceImpl implements RoleService {
                 rtnRow.setRoleName(row.getRoleName());
                 rtnListAll.add(rtnRow);
             }
-
         }
         return rtnListAll;
     }
